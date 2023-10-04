@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CONST\AdminRolesCons;
 use App\Helpers\Services\ProductService;
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
@@ -91,7 +92,7 @@ class ProductController extends Controller
             return $this->errorResponse(message:'Unauthorized!');
         }
 
-        if ($user->role_id == 3) {
+        if ($user->role_id == AdminRolesCons::USER) {
             return $this->errorResponse(null, ResponseAlias::HTTP_METHOD_NOT_ALLOWED, 'Разрешение откланено');
         }
 

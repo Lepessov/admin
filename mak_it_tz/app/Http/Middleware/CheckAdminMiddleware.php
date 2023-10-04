@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\CONST\AdminRolesCons;
 use App\Traits\ApiResponse;
 use Closure;
 use Illuminate\Http\Response;
@@ -15,8 +16,8 @@ class CheckAdminMiddleware
     {
         $user = auth('api')->user();
 
-        if (!$user || $user->role_id !== 1) {
-            return $this->errorResponse(null, Response::HTTP_METHOD_NOT_ALLOWED, 'Permission denied!');
+        if (!$user || $user->role_id !== AdminRolesCons::USER) {
+            return $this->errorResponse(null, Response::HTTP_METHOD_NOT_ALLOWED, 'Разрешение отколнено!');
         }
 
         return $next($request);

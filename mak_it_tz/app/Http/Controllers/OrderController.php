@@ -2,34 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\UnauthorizedException;
 use App\Http\Requests\OrderRequest;
 use App\Models\Order;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class OrderController extends Controller
 {
     use ApiResponse;
-
-    public $user;
-
-    /**
-     * @throws UnauthorizedException
-     */
-    public function __construct()
-    {
-        $this->user = auth('api')->user();
-
-        if (is_null($this->user)) {
-            throw new UnauthorizedException();
-        }
-    }
 
     /**
      * @OA\Get(
@@ -50,7 +31,9 @@ class OrderController extends Controller
      */
     public function index(): JsonResponse
     {
-        $orders = Order::with(['user', 'product'])->where('user_id', $this->user->id)->get();
+        $user = auth('api')->user();
+
+        $orders = Order::with(['user', 'product'])->where('user_id', $user->id)->get();
 
         return $this->successResponse($orders, ResponseAlias::HTTP_OK, 'ready');
     }
@@ -147,8 +130,10 @@ class OrderController extends Controller
      */
     public function create(OrderRequest $request): JsonResponse
     {
+        $user = auth('api')->user();
+
         $validatedData = $request->validated();
-        $validatedData['user_id'] = $this->user->id;
+        $validatedData['user_id'] = $user->id;
 
         $order = Order::query()->create($validatedData);
 
@@ -263,11 +248,11 @@ class OrderController extends Controller
         $order = Order::find($id);
 
         if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return $this->errorResponse($order, ResponseAlias::HTTP_NOT_FOUND, 'This item is not found!');
         }
 
         $order->delete();
 
-        return response()->json(['message' => 'Order deleted successfully']);
+        return $this->successResponse($order, ResponseAlias::HTTP_ACCEPTED, 'updated');
     }
 }

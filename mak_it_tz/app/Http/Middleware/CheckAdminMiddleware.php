@@ -7,6 +7,7 @@ use App\Traits\ApiResponse;
 use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class CheckAdminMiddleware
 {
@@ -17,7 +18,7 @@ class CheckAdminMiddleware
         $user = auth('api')->user();
 
         if (!$user || $user->role_id !== AdminRolesCons::USER) {
-            return $this->errorResponse(null, Response::HTTP_METHOD_NOT_ALLOWED, 'Разрешение отколнено!');
+            return $this->errorResponse(null, ResponseAlias::HTTP_METHOD_NOT_ALLOWED, 'Разрешение отколнено!');
         }
 
         return $next($request);

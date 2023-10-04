@@ -27,6 +27,7 @@ run:
 
 ```
 make fpm-php
+php artisan migrate
 php artisan db:seed
 ```
 
